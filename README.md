@@ -53,7 +53,7 @@ The usage is similar to `yii\log\DbTarget`.
     // migrate and rotate settings for console application.
     'controllerMap' => [
         'migrate' => [
-            'class' => yii\console\controllers\MigrateController::class,
+            'class' => \yii\console\controllers\MigrateController::class,
             'migrationPath' => [
                 ...
                 '@vendor/razonyang/yii2-log/src/migrations',
@@ -61,7 +61,7 @@ The usage is similar to `yii\log\DbTarget`.
             ],
         ],
         'log' => [
-            'class' => razonyang\yii\log\LogController::class,
+            'class' => \razonyang\yii\log\LogController::class,
         ]
     ],
 
@@ -78,6 +78,6 @@ The usage is similar to `yii\log\DbTarget`.
 ### Rotate
 
 ```
-./yii log/ratote
+./yii log/rotate
 ```
 
