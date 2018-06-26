@@ -2,7 +2,7 @@
 
 I wrote this extension for resolving the following problems:
 
-1. The logs are chaotic, I cannot identity which logs are came from the same requests.
+1. The logs are chaotic, I cannot distinguish which logs are came from the same requests.
  It is hard to debug in concurrent scenarios.
 2. The `yii\log\DbTarget` does not provide rotate feature.
 
