@@ -1,0 +1,21 @@
+{
+  "name": "razonyang/yii2-log",
+  "description": "Enhanced DB Target for Yii2 Log Component",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "razonyang",
+      "email": "razonyang@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "yiisoft/yii2": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "razonyang\\yii\\log\\": "src"
+    }
+  }
+}
