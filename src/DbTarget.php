@@ -170,26 +170,6 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
     }
 
     /**
-     * @var Connection rotate Db connection.
-     */
-    private $rotateDb;
-
-    /**
-     * create new database connection, if there is an open transaction
-     * to ensure insert statement is not affected by a rollback.
-     * @return array|string|\yii\db\Connection
-     */
-    public function getRotateDb()
-    {
-        if ($this->rotateDb === null) {
-            $this->rotateDb = clone $this->db;
-            Instance::ensure($this->rotateDb, Connection::className());
-        }
-
-        return $this->rotateDb;
-    }
-
-    /**
      * The Mutex for lock rotate process.
      * @var mixed
      */
@@ -237,10 +217,10 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
             throw new \RuntimeException('could not acquire rotate mutex: ' . $this->rotateMutexKey);
         }
 
-        $db = $this->getRotateDb();
         $logTableMeta = $this->getLogTableMeta();
         $logTableName = $logTableMeta->fullName;
 
+        $db = $this->db;
         $amount = ActiveRecord::find()
             ->from($logTableName)
             ->count('*', $db);
@@ -250,20 +230,27 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
 
         $transaction = $db->beginTransaction();
         try {
-            // update log rotate field for rotating and removing rotated logs.
-            ActiveRecord::updateAll(['rotate' => 1]);
-
             // generate rotate table.
             $rotateTableName = $this->rotateTableName();
-            $rotateTableSql = $this->getRotateDb()->getQueryBuilder()->createTable($rotateTableName, ArrayHelper::map($logTableMeta->columns, 'name', 'type'));
-            $db->createCommand($rotateTableSql)->execute();
-            Yii::info('created rotate log table: ' . $rotateTableName, __METHOD__);
+            if (!$db->getTableSchema($rotateTableName, true)) {
+                // create table if it does not exists.
+                $rotateTableSql = $db->getQueryBuilder()->createTable($rotateTableName, ArrayHelper::map($logTableMeta->columns, 'name', 'type'));
+                $db->createCommand($rotateTableSql)->execute();
+                Yii::info('created rotate log table: ' . $rotateTableName, __METHOD__);
+            }
+
+            // update log rotate field for rotating and removing rotated logs.
+            $updateSql = <<<EOL
+UPDATE {$logTableName}
+SET rotate = 1
+EOL;
+            $db->createCommand($updateSql)->execute();
 
             // import logs to rotate table.
             $columns = implode(', ', $logTableMeta->columnNames);
             $dataSql = <<<EOL
 INSERT INTO {$rotateTableName}($columns)
-SELECT {$columns} FROM {$logTableMeta->fullName}
+SELECT {$columns} FROM {$logTableName}
 WHERE rotate = 1
 EOL;
             $rotateRows = $db->createCommand($dataSql)->execute();
@@ -271,7 +258,7 @@ EOL;
 
             // remove logs from original table which has been rotated.
             $rmSql = <<<EOL
-DELETE FROM {$logTableMeta->fullName}
+DELETE FROM {$logTableName}
 WHERE rotate = 1
 EOL;
             $rmRows = $db->createCommand($rmSql)->execute();
@@ -297,7 +284,7 @@ EOL;
     private function getLogTableMeta()
     {
         if ($this->logTableMeta === null) {
-            $this->logTableMeta = $this->getRotateDb()->getTableSchema($this->logTable, true);
+            $this->logTableMeta = $this->db->getTableSchema($this->logTable, true);
         }
 
         return $this->logTableMeta;
