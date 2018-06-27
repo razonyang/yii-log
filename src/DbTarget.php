@@ -241,12 +241,8 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
         $logTableMeta = $this->getLogTableMeta();
         $logTableName = $logTableMeta->fullName;
 
-        // $toTime is used to avoid removing request's logs which are processing
-        // but not logged or rotated yet.
-        $toTime = time() - 5 * 60;
         $amount = ActiveRecord::find()
             ->from($logTableName)
-            ->where(['<', 'requested_at', $toTime])
             ->count('*', $db);
         if ($amount < $this->rotateInterval) {
             throw new InvalidCallException('the rotate interval has not been reached yet');
@@ -254,6 +250,9 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
 
         $transaction = $db->beginTransaction();
         try {
+            // update log rotate field for rotating and removing rotated logs.
+            ActiveRecord::updateAll(['rotate' => 1]);
+
             // generate rotate table.
             $rotateTableName = $this->rotateTableName();
             $rotateTableSql = $this->getRotateDb()->getQueryBuilder()->createTable($rotateTableName, ArrayHelper::map($logTableMeta->columns, 'name', 'type'));
@@ -265,7 +264,7 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
             $dataSql = <<<EOL
 INSERT INTO {$rotateTableName}($columns)
 SELECT {$columns} FROM {$logTableMeta->fullName}
-WHERE requested_at < {$toTime}
+WHERE rotate = 1
 EOL;
             $rotateRows = $db->createCommand($dataSql)->execute();
             Yii::info('rotated logs: ' . $rotateRows, __METHOD__);
@@ -273,7 +272,7 @@ EOL;
             // remove logs from original table which has been rotated.
             $rmSql = <<<EOL
 DELETE FROM {$logTableMeta->fullName}
-WHERE requested_at < {$toTime}
+WHERE rotate = 1
 EOL;
             $rmRows = $db->createCommand($rmSql)->execute();
             Yii::info('removed rotated logs from original table: ' . $rmRows, __METHOD__);

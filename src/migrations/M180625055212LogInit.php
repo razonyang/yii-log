@@ -73,6 +73,7 @@ class M180625055212LogInit extends Migration
                 'log_time' => $this->double(),
                 'prefix' => $this->text(),
                 'message' => $this->text(),
+                'rotate' => $this->tinyInteger(),
             ], $tableOptions);
 
             $this->createIndex('PRIMARY KEY', $target->logTable, ['request_id', 'log_id'], true);
