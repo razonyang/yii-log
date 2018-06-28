@@ -1,0 +1,27 @@
+paths:
+    tests: tests
+    output: tests/_output
+    data: tests/_data
+    support: tests/_support
+    envs: tests/_envs
+actor_suffix: Tester
+settings:
+    bootstrap: _bootstrap.php
+    memory_limit: 1024M
+    colors: true
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
+modules:
+   enabled:
+      - Yii2:
+          configFile: 'tests/config.php'
+          part: orm
+      - Db:
+          dsn: 'mysql:host=localhost;dbname=testdb'
+          user: 'root'
+          password: '123456'
+          dump: 'tests/_data/dump.sql'
+          populate: true
+          cleanup: true
+          populator: 'mysql -u$user -h$host -p$password $dbname < $dump'

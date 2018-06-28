@@ -17,5 +17,10 @@
     "psr-4": {
       "razonyang\\yii\\log\\": "src"
     }
+  },
+  "require-dev": {
+    "codeception/codeception": "^2.4",
+    "codeception/verify": "~0.3.1",
+    "codeception/specify": "~0.4.3"
   }
 }

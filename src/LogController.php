@@ -11,14 +11,23 @@ class LogController extends Controller
         $log = Yii::$app->getLog();
         foreach ($log->targets as $target) {
             if (!$target instanceof Rotate) {
-                Yii::info('the log target does not implement ' . Rotate::class . ' : ' . get_class($target));
+                $msg = 'the log target does not implement ' . Rotate::class . ' : ' . get_class($target);
+                Yii::info($msg, __METHOD__);
+                echo $msg . PHP_EOL;
+                continue;
+            } else if (!$target->canRotate()) {
+                $msg = 'can not rotate or rotate has been disabled: ' . get_class($target);
+                Yii::info($msg, __METHOD__);
+                echo $msg . PHP_EOL;
                 continue;
             }
 
             try {
                 $target->rotate();
+                echo 'rotated successfully' . PHP_EOL;
             } catch (\Exception $e) {
                 Yii::error($e, __METHOD__);
+                echo $e->getMessage() . PHP_EOL;
             }
         }
     }

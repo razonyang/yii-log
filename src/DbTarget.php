@@ -197,80 +197,90 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
     }
 
     /**
-     * @throws InvalidConfigException|InvalidCallException
+     * @inheritdoc
      */
     public function rotate()
     {
-        if ($this->rotateInterval <= 0) {
-            throw new InvalidCallException('can not rotate or rotate has been disabled');
-        }
-
-        /** @var null|Mutex $mutex */
-        $mutex = Yii::$app->get($this->rotateMutex);
-        if (!$mutex) {
-            throw new InvalidConfigException('rotate mutex class is required');
-        }
-        if (!$mutex instanceof Mutex) {
-            throw new InvalidConfigException('rotate mutex class does not implement ' . Mutex::class);
-        }
-        if (!$mutex->acquire($this->rotateMutexKey, $this->rotateMutexAcquireTimeout)) {
-            throw new \RuntimeException('could not acquire rotate mutex: ' . $this->rotateMutexKey);
-        }
-
-        $logTableMeta = $this->getLogTableMeta();
-        $logTableName = $logTableMeta->fullName;
-
-        $db = $this->db;
-        $amount = ActiveRecord::find()
-            ->from($logTableName)
-            ->count('*', $db);
-        if ($amount < $this->rotateInterval) {
-            throw new InvalidCallException('the rotate interval has not been reached yet');
-        }
-
-        $transaction = $db->beginTransaction();
         try {
-            // generate rotate table.
-            $rotateTableName = $this->rotateTableName();
-            if (!$db->getTableSchema($rotateTableName, true)) {
-                // create table if it does not exists.
-                $rotateTableSql = $db->getQueryBuilder()->createTable($rotateTableName, ArrayHelper::map($logTableMeta->columns, 'name', 'type'));
-                $db->createCommand($rotateTableSql)->execute();
-                Yii::info('created rotate log table: ' . $rotateTableName, __METHOD__);
+            /** @var null|Mutex $mutex */
+            $mutex = Yii::$app->get($this->rotateMutex);
+            if (!$mutex) {
+                throw new InvalidConfigException('rotate mutex class is required');
+            }
+            if (!$mutex instanceof Mutex) {
+                throw new InvalidConfigException('rotate mutex class does not implement ' . Mutex::class);
+            }
+            if (!$mutex->acquire($this->rotateMutexKey, $this->rotateMutexAcquireTimeout)) {
+                throw new \RuntimeException('could not acquire rotate mutex: ' . $this->rotateMutexKey);
+            }
+            $logTableMeta = $this->getLogTableMeta();
+            $logTableName = $logTableMeta->fullName;
+
+            $db = clone $this->db;
+            $amount = ActiveRecord::find()
+                ->from($logTableName)
+                ->count('*', $db);
+            if ($amount < $this->rotateInterval) {
+                throw new InvalidCallException('the rotate interval has not been reached yet');
             }
 
-            // update log rotate field for rotating and removing rotated logs.
-            $updateSql = <<<EOL
+            $transaction = $db->beginTransaction();
+            try {
+                // generate rotate table.
+                $rotateTableName = $this->rotateTableName();
+                if (!$db->getTableSchema($rotateTableName, true)) {
+                    // create table if it does not exists.
+                    $rotateTableSql = $db->getQueryBuilder()->createTable($rotateTableName, ArrayHelper::map($logTableMeta->columns, 'name', 'type'));
+                    $db->createCommand($rotateTableSql)->execute();
+                    Yii::info('created rotate log table: ' . $rotateTableName, __METHOD__);
+                }
+
+                // update log rotate field for rotating and removing rotated logs.
+                $updateSql = <<<EOL
 UPDATE {$logTableName}
 SET rotate = 1
 EOL;
-            $db->createCommand($updateSql)->execute();
+                $db->createCommand($updateSql)->execute();
 
-            // import logs to rotate table.
-            $columns = implode(', ', $logTableMeta->columnNames);
-            $dataSql = <<<EOL
+                // import logs to rotate table.
+                $columns = implode(', ', $logTableMeta->columnNames);
+                $dataSql = <<<EOL
 INSERT INTO {$rotateTableName}($columns)
 SELECT {$columns} FROM {$logTableName}
 WHERE rotate = 1
 EOL;
-            $rotateRows = $db->createCommand($dataSql)->execute();
-            Yii::info('rotated logs: ' . $rotateRows, __METHOD__);
+                $rotateRows = $db->createCommand($dataSql)->execute();
+                Yii::info('rotated logs: ' . $rotateRows, __METHOD__);
 
-            // remove logs from original table which has been rotated.
-            $rmSql = <<<EOL
+                // remove logs from original table which has been rotated.
+                $rmSql = <<<EOL
 DELETE FROM {$logTableName}
 WHERE rotate = 1
 EOL;
-            $rmRows = $db->createCommand($rmSql)->execute();
-            Yii::info('removed rotated logs from original table: ' . $rmRows, __METHOD__);
+                $rmRows = $db->createCommand($rmSql)->execute();
+                Yii::info('removed rotated logs: ' . $rmRows, __METHOD__);
 
-            $transaction->commit();
-            return true;
+                $transaction->commit();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                // rethrow it.
+                throw $e;
+            }
         } catch (\Exception $e) {
-            $transaction->rollBack();
-            Yii::error($e, __METHOD__);
-            return false;
+            // rethrow it.
+            throw $e;
+        } finally {
+            // release mutex.
+            $mutex->release($this->rotateMutexKey);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canRotate()
+    {
+        return $this->rotateInterval > 0;
     }
 
     /**
