@@ -5,5 +5,9 @@
 actor: UnitTester
 modules:
     enabled:
+        - Yii2:
+            configFile: 'tests/config.php'
+            part: orm
+            transaction: false
         - Asserts
         - \Helper\Unit
