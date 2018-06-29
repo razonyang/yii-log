@@ -11,7 +11,8 @@
   ],
   "minimum-stability": "stable",
   "require": {
-    "yiisoft/yii2": "~2.0"
+    "yiisoft/yii2": "~2.0",
+    "fxp/composer-asset-plugin": "^1.4"
   },
   "autoload": {
     "psr-4": {
