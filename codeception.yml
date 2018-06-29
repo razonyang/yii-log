@@ -25,4 +25,4 @@ modules:
           dump: 'tests/_data/dump.sql'
           populate: true
           cleanup: true
-          populator: 'mysql -u$user -h$host -p$password $dbname < $dump'
+          populator: 'mysql -u$user -h$host $dbname < $dump'
