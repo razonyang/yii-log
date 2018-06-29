@@ -13,7 +13,7 @@ env:
 before_install:
 - composer self-update
 - composer clear-cache
-- composer global require "fxp/composer-asset-plugin:^1.4"
+- composer require "fxp/composer-asset-plugin:^1.4"
 - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
 
 install:
