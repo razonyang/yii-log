@@ -6,8 +6,8 @@ use yii\db\ActiveRecord;
 /**
  * Class Log
  *
- * @property integer $log_id
  * @property string $request_id
+ * @property integer $log_id
  * @property double $requested_at
  * @property integer $level
  * @property string $category

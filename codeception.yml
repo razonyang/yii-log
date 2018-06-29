@@ -17,6 +17,7 @@ modules:
       - Yii2:
           configFile: 'tests/config.php'
           part: orm
+          transaction: false
       - Db:
           dsn: 'mysql:host=localhost;dbname=testdb'
           user: 'root'

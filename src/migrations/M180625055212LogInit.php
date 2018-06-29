@@ -65,8 +65,8 @@ class M180625055212LogInit extends Migration
             }
 
             $this->createTable($target->logTable, [
-                'log_id' => $this->integer()->comment('log id'),
                 'request_id' => $this->char(32),
+                'log_id' => $this->integer()->comment('log id'),
                 'requested_at' => $this->double(),
                 'level' => $this->tinyInteger(),
                 'category' => $this->string(),
@@ -76,7 +76,7 @@ class M180625055212LogInit extends Migration
                 'rotate' => $this->tinyInteger(),
             ], $tableOptions);
 
-            $this->createIndex('PRIMARY KEY', $target->logTable, ['request_id', 'log_id'], true);
+            $this->addPrimaryKey('PRIMARY KEY', $target->logTable, ['request_id', 'log_id'], true);
             $this->createIndex('idx_request_id', $target->logTable, 'request_id');
             $this->createIndex('idx_requested_at', $target->logTable, 'requested_at');
             $this->createIndex('idx_log_level', $target->logTable, 'level');

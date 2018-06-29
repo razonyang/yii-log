@@ -99,19 +99,32 @@ class DbTargetTest extends \Codeception\Test\Unit
 
         // export logs.
         $this->target->messages = $logs;
+        codecept_debug('export messages');
         $this->target->export();
 
-        // rotate round one, large than logs amount
-        $this->target->rotateInterval = 101;
-        $this->expectExceptionMessage('the rotate interval has not been reached yet',function (){
-            $this->target->rotate();
-        });
-
-        // rotate round one, large than logs amount
-        $this->target->rotateInterval = 99;
-        $tableName = $this->target->rotateTableName();
+        $this->target->rotateInterval = $times - rand(0, $times - 1);
         $this->target->rotate();
 
-        $this->tester->seeNumRecords(2222111,$tableName);
+        $rotateTableName = $this->target->rotateTableName();
+        $requestId = $this->target->getRequestId();
+
+        $rotateModel = <<<EOL
+class {$rotateTableName} extends \yii\db\ActiveRecord {
+    public static function tableName() {
+        return '{$rotateTableName}';
+    }
+}
+EOL;
+        eval($rotateModel);
+
+        foreach ($logs as $log) {
+            list($message, $level, $category, $timestamp) = $log;
+            $this->tester->seeRecord($rotateTableName, [
+                'request_id' => $requestId,
+                'level' => $level,
+                'message' => $message,
+                'category' => $category,
+            ]);
+        }
     }
 }

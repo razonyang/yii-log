@@ -220,6 +220,8 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
             $amount = ActiveRecord::find()
                 ->from($logTableName)
                 ->count('*', $db);
+            Yii::info($amount);
+            Yii::info($this->rotateInterval);
             if ($amount < $this->rotateInterval) {
                 throw new InvalidCallException('the rotate interval has not been reached yet');
             }
@@ -230,8 +232,19 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
                 $rotateTableName = $this->rotateTableName();
                 if (!$db->getTableSchema($rotateTableName, true)) {
                     // create table if it does not exists.
-                    $rotateTableSql = $db->getQueryBuilder()->createTable($rotateTableName, ArrayHelper::map($logTableMeta->columns, 'name', 'type'));
-                    $db->createCommand($rotateTableSql)->execute();
+                    $createSqls[] = $db->getQueryBuilder()->createTable(
+                        $rotateTableName,
+                        ArrayHelper::map($logTableMeta->columns, 'name', 'dbType')
+                    );
+                    $createSqls[] = $db->getQueryBuilder()->addPrimaryKey('PRIMARY KEY', $rotateTableName, ['request_id', 'log_id'], true);
+                    $createSqls[] = $db->getQueryBuilder()->createIndex('idx_request_id', $rotateTableName, 'request_id');
+                    $createSqls[] = $db->getQueryBuilder()->createIndex('idx_requested_at', $rotateTableName, 'requested_at');
+                    $createSqls[] = $db->getQueryBuilder()->createIndex('idx_log_level', $rotateTableName, 'level');
+                    $createSqls[] = $db->getQueryBuilder()->createIndex('idx_log_category', $rotateTableName, 'category');
+
+                    foreach ($createSqls as $createSql) {
+                        $db->createCommand($createSql)->execute();
+                    }
                     Yii::info('created rotate log table: ' . $rotateTableName, __METHOD__);
                 }
 
