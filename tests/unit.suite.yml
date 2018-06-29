@@ -6,7 +6,7 @@ actor: UnitTester
 modules:
     enabled:
         - Yii2:
-            configFile: 'tests/config.php'
+            configFile: 'config.php'
             part: orm
             transaction: false
         - Asserts
