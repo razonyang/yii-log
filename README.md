@@ -1,9 +1,8 @@
 # Enhanced DB Target for Yii2 Log Component
 
-
 [![Packagist](https://img.shields.io/packagist/dt/razonyang/yii2-log.svg?style=flat-square)](https://packagist.org/packages/razonyang/yii2-log)
 [![Packagist](https://img.shields.io/packagist/v/razonyang/yii2-log.svg?style=flat-square)](https://github.com/razonyang/yii2-log/releases)
-
+[![Travis](https://img.shields.io/travis/razonyang/yii2-log.svg?style=flat-square)](https://travis-ci.org/razonyang/yii2-log)
 
 I wrote this extension for resolving the following problems:
 
