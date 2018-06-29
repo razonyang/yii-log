@@ -7,13 +7,12 @@ php:
 - 7.2
 
 before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
+
 
 install:
   - travis_retry composer self-update && composer --version
   - travis_retry composer update --dev --prefer-dist --no-interaction
-
-before-script:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
 
 script:
   - composer validate --strict
