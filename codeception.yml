@@ -21,7 +21,7 @@ modules:
       - Db:
           dsn: 'mysql:host=localhost;dbname=testdb'
           user: 'root'
-          password: '123456'
+          password: ''
           dump: 'tests/_data/dump.sql'
           populate: true
           cleanup: true

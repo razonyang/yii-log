@@ -9,7 +9,7 @@ return [
             'class' => \yii\db\Connection::class,
             'dsn' => 'mysql:host=localhost;dbname=testdb',
             'username' => 'root',
-            'password' => '123456',
+            'password' => '',
             'charset' => 'utf8mb4',
             'tablePrefix' => 't_',
         ],

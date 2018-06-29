@@ -14,9 +14,6 @@ before_install:
 - composer self-update
 - composer clear-cache
 - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
-- sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('123456') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
-- sudo service mysql restart
-
 
 install:
 - travis_retry composer self-update
@@ -24,6 +21,7 @@ install:
 - travis_retry composer install $DEFAULT_COMPOSER_FLAGS
 
 before_script:
+- composer global require "fxp/composer-asset-plugin:^1.4"
 
 script:
 - ./vendor/bin/codecept run
