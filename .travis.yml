@@ -15,7 +15,7 @@ before_install:
 
 
 install:
-- composer install --ignore-platform-reqs
+- composer install
 
 before_script:
 
