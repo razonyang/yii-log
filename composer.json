@@ -9,10 +9,9 @@
       "email": "razonyang@gmail.com"
     }
   ],
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "require": {
-    "yiisoft/yii2": "~2.0",
-    "fxp/composer-asset-plugin": "^1.4"
+    "yiisoft/yii2": "~2.0"
   },
   "autoload": {
     "psr-4": {
