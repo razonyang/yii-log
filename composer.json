@@ -20,5 +20,11 @@
     "psr-4": {
       "razonyang\\yii\\log\\": "src"
     }
-  }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]
 }
