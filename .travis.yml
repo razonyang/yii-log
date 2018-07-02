@@ -6,13 +6,16 @@ php:
 - 7.1
 - 7.2
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS testdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
 
-
 install:
   - travis_retry composer self-update && composer --version
-  - travis_retry composer update --prefer-source --no-interaction
+  - travis_retry composer update --prefer-dist --no-interaction
 
 script:
   - composer validate --strict
