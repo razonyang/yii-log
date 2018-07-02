@@ -11,14 +11,19 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "yiisoft/yii2": "~2.0"
+    "yiisoft/yii2": "~2.0.15"
+  },
+  "require-dev": {
+    "codeception/codeception": "~2.4.0"
+  },
+  "config": {
+    "fxp-asset": {
+      "enabled": false
+    }
   },
   "autoload": {
     "psr-4": {
       "razonyang\\yii\\log\\": "src"
     }
-  },
-  "require-dev": {
-    "codeception/codeception": "~2.4.0"
   }
 }
