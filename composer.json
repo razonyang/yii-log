@@ -16,11 +16,6 @@
   "require-dev": {
     "codeception/codeception": "~2.4.0"
   },
-  "config": {
-    "fxp-asset": {
-      "enabled": false
-    }
-  },
   "autoload": {
     "psr-4": {
       "razonyang\\yii\\log\\": "src"
