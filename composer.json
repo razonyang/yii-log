@@ -9,9 +9,9 @@
       "email": "razonyang@gmail.com"
     }
   ],
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
-    "yiisoft/yii2": "~2.0"
+    "yiisoft/yii2": "~2.0.15"
   },
   "autoload": {
     "psr-4": {
