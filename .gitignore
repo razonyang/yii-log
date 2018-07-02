@@ -1,5 +1,7 @@
+# IDE
 .idea
 
-composer.lock
-
+# composer
+composer
+composer.phar
 vendor
