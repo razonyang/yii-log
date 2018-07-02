@@ -3,5 +3,6 @@
 
 # composer
 composer
+composer.lock
 composer.phar
 vendor
