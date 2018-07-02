@@ -12,7 +12,7 @@ before_install:
 
 install:
   - travis_retry composer self-update && composer --version
-  - travis_retry composer update --dev --prefer-dist --no-interaction
+  - travis_retry composer update --dev --prefer-source --prefer-stable --no-interaction
 
 script:
   - composer validate --strict
