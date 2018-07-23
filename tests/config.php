@@ -45,7 +45,7 @@ return [
         'migrate' => [
             'class' => \yii\console\controllers\MigrateController::class,
             'migrationPath' => [
-                '@vendor/razonyang/yii2-log/src/migrations',
+                '@vendor/razonyang/yii-log/src/migrations',
             ],
         ],
         'log' => [

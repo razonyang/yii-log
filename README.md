@@ -1,8 +1,8 @@
 # Enhanced DB Target for Yii2 Log Component
 
-[![Packagist](https://img.shields.io/packagist/dt/razonyang/yii2-log.svg?style=flat-square)](https://packagist.org/packages/razonyang/yii2-log)
-[![Packagist](https://img.shields.io/packagist/v/razonyang/yii2-log.svg?style=flat-square)](https://github.com/razonyang/yii2-log/releases)
-[![Travis](https://img.shields.io/travis/razonyang/yii2-log.svg?style=flat-square)](https://travis-ci.org/razonyang/yii2-log)
+[![Packagist](https://img.shields.io/packagist/dt/razonyang/yii-log.svg?style=flat-square)](https://packagist.org/packages/razonyang/yii-log)
+[![Packagist](https://img.shields.io/packagist/v/razonyang/yii-log.svg?style=flat-square)](https://github.com/razonyang/yii-log/releases)
+[![Travis](https://img.shields.io/travis/razonyang/yii-log.svg?style=flat-square)](https://travis-ci.org/razonyang/yii-log)
 
 I wrote this extension for resolving the following problems:
 
@@ -13,7 +13,7 @@ I wrote this extension for resolving the following problems:
 ## Installation
 
 ```
-composer require --prefer-dist razonyang/yii2-log
+composer require --prefer-dist razonyang/yii-log
 ```
 
 ## Usage
@@ -60,7 +60,7 @@ The usage is similar to `yii\log\DbTarget`.
             'class' => \yii\console\controllers\MigrateController::class,
             'migrationPath' => [
                 ...
-                '@vendor/razonyang/yii2-log/src/migrations',
+                '@vendor/razonyang/yii-log/src/migrations',
                 ...
             ],
         ],

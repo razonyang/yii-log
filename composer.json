@@ -1,5 +1,5 @@
 {
-  "name": "razonyang/yii2-log",
+  "name": "razonyang/yii-log",
   "description": "Enhanced DB Target for Yii2 Log Component",
   "type": "library",
   "license": "MIT",
