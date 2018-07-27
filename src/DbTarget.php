@@ -208,7 +208,7 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
                 throw new InvalidConfigException('rotate mutex class is required');
             }
             if (!$mutex instanceof Mutex) {
-                throw new InvalidConfigException('rotate mutex class does not implement ' . Mutex::class);
+                throw new InvalidConfigException('rotate mutex class does not implement ' . Mutex::className());
             }
             if (!$mutex->acquire($this->rotateMutexKey, $this->rotateMutexAcquireTimeout)) {
                 throw new \RuntimeException('could not acquire rotate mutex: ' . $this->rotateMutexKey);
