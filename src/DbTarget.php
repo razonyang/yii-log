@@ -274,15 +274,13 @@ EOL;
                 Yii::info('removed rotated logs: ' . $rmRows, __METHOD__);
 
                 $transaction->commit();
-                // release mutex.
-                $mutex->release($this->rotateMutexKey);
             } catch (\Exception $e) {
                 $transaction->rollBack();
-                // release mutex.
-                $mutex->release($this->rotateMutexKey);
                 // rethrow it.
                 throw $e;
             }
+            // release mutex.
+            $mutex->release($this->rotateMutexKey);
         } catch (\Exception $e) {
             // release mutex.
             $mutex->release($this->rotateMutexKey);
