@@ -24,10 +24,9 @@ The usage is similar to `yii\log\DbTarget`.
 
 ```php
 [
-    ...
 
     'components' => [
-        ...
+
         'log' => [
             'targets' => [
                 [
@@ -49,19 +48,18 @@ The usage is similar to `yii\log\DbTarget`.
         'mutex' => [
             'class' => \yii\mutex\FileMutex::class,
         ],
-        ...
+
     ],
 
-    ...
 
     // migrate and rotate settings for console application.
     'controllerMap' => [
         'migrate' => [
             'class' => \yii\console\controllers\MigrateController::class,
             'migrationPath' => [
-                ...
+
                 '@vendor/razonyang/yii-log/src/migrations',
-                ...
+
             ],
         ],
         'log' => [
@@ -69,7 +67,6 @@ The usage is similar to `yii\log\DbTarget`.
         ]
     ],
 
-    ...
 ]
 ```
 
