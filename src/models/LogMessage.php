@@ -1,7 +1,5 @@
 <?php
-namespace razonyang\yii\log;
-
-use yii\db\ActiveRecord;
+namespace razonyang\yii\log\models;
 
 /**
  * Class Log
@@ -15,10 +13,7 @@ use yii\db\ActiveRecord;
  * @property string $message
  * @property double $log_time
  */
-class Log extends ActiveRecord
+class LogMessage extends BaseActiveRecord
 {
-    public static function tableName()
-    {
-        return '{{%log}}';
-    }
+    public static $tableName = '{{%log_message}}';
 }

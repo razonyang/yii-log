@@ -31,4 +31,23 @@ class LogController extends Controller
             }
         }
     }
+
+    /**
+     * Garbage collection.
+     */
+    public function actionGc()
+    {
+        $log = Yii::$app->getLog();
+        foreach ($log->targets as $target) {
+            if (!$target instanceof GarbageCollector) {
+                continue;
+            }
+
+            try {
+                $target->gc();
+            } catch (\Exception $e) {
+                Yii::error($e, __METHOD__);
+            }
+        }
+    }
 }

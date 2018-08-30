@@ -1,6 +1,8 @@
 <?php
 namespace razonyang\yii\log;
 
+use razonyang\yii\log\models\Log;
+use razonyang\yii\log\models\LogMessage;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidCallException;
@@ -19,8 +21,18 @@ use yii\mutex\Mutex;
  *
  * @property integer $rotateInterval
  */
-class DbTarget extends \yii\log\DbTarget implements Rotate
+class DbTarget extends \yii\log\DbTarget implements Rotate, GarbageCollector
 {
+    public $logMessageTable = '{{%log_message}}';
+
+    public function init()
+    {
+        parent::init();
+
+        Log::$tableName = $this->logTable;
+        LogMessage::$tableName = $this->logMessageTable;
+    }
+
     /**
      * @inheritdoc
      */
@@ -32,7 +44,9 @@ class DbTarget extends \yii\log\DbTarget implements Rotate
             $this->db = clone $this->db;
         }
 
-        $tableName = $this->db->quoteTableName($this->logTable);
+        $log = new Log();
+
+        $tableName = $this->db->quoteTableName($this->logMessageTable);
         $sql = "INSERT INTO $tableName ([[log_id]], [[request_id]], [[requested_at]], [[level]], [[category]], [[log_time]], [[prefix]], [[message]])
                 VALUES (:log_id, :request_id, :requested_at, :level, :category, :log_time, :prefix, :message)";
         $command = $this->db->createCommand($sql);
@@ -312,5 +326,14 @@ EOL;
         }
 
         return $this->logTableMeta;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function gc()
+    {
+        $clean = $this->db->getQueryBuilder()->delete($this->getLogTableMeta()->fullName, []);
+        return $this->db->createCommand($clean);
     }
 }
