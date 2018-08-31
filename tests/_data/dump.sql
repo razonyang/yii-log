@@ -32,6 +32,8 @@ CREATE TABLE `t_log` (
   COMMENT 'request time',
   `context`      TEXT COLLATE utf8mb4_unicode_ci NOT NULL
   COMMENT 'context',
+  `extra`        TEXT COLLATE utf8mb4_unicode_ci NOT NULL
+  COMMENT 'extra info',
   PRIMARY KEY (`id`),
   KEY `idx_requested_at` (`requested_at`),
   KEY `idx_application` (`application`),

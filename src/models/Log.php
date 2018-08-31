@@ -25,6 +25,7 @@ use yii\web\Response as WebResponse;
  * @property string $status_text HTTP status text
  * @property string $context context
  * @property double $requested_at request time
+ * @property string $extra extra info
  */
 class Log extends yii\db\ActiveRecord
 {
@@ -37,7 +38,7 @@ class Log extends yii\db\ActiveRecord
     {
         return [
             [['id'], 'required'],
-            [['application', 'route', 'url', 'method', 'status_text', 'ip', 'user_agent', 'raw_body', 'context'], 'default', 'value' => ''],
+            [['application', 'route', 'url', 'method', 'status_text', 'ip', 'user_agent', 'raw_body', 'context', 'extra'], 'default', 'value' => ''],
             [['exited_status', 'status'], 'default', 'value' => 0],
         ];
     }

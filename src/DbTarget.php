@@ -17,6 +17,11 @@ use yii\web\Response as WebResponse;
 class DbTarget extends \yii\log\DbTarget implements GarbageCollector
 {
     /**
+     * @var callable a PHP callable that returns a string to be extra info to every exported request log.
+     */
+    public $extra;
+
+    /**
      * @var string
      */
     public $logMessageTable = '{{%log_message}}';
@@ -101,8 +106,8 @@ class DbTarget extends \yii\log\DbTarget implements GarbageCollector
             $requestedAt = $this->getRequestedAt();
 
             $table = $this->db->quoteTableName($this->logTable);
-            $sql = "INSERT INTO $table ( [[id]], [[requested_at]], [[application]], [[route]], [[exit_status]], [[ip]], [[url]], [[method]], [[raw_body]], [[user_agent]], [[status]], [[status_text]], [[context]])
-                VALUES (:id, :requested_at, :application, :route, :exit_status, :ip, :url, :method, :raw_body, :user_agent, :status, :status_text, :context)";
+            $sql = "INSERT INTO $table ( [[id]], [[requested_at]], [[application]], [[route]], [[exit_status]], [[ip]], [[url]], [[method]], [[raw_body]], [[user_agent]], [[status]], [[status_text]], [[context]], [[extra]])
+                VALUES (:id, :requested_at, :application, :route, :exit_status, :ip, :url, :method, :raw_body, :user_agent, :status, :status_text, :context, :extra)";
             $command = $this->db->createCommand($sql);
             $logData = [
                 ':id' => $logId,
@@ -118,6 +123,7 @@ class DbTarget extends \yii\log\DbTarget implements GarbageCollector
                 ':status' => 0,
                 ':status_text' => '',
                 ':context' => $this->getContext(),
+                ':extra' => $this->getExtra(),
             ];
             $app = Yii::$app;
             if ($app !== null) {
@@ -173,6 +179,15 @@ class DbTarget extends \yii\log\DbTarget implements GarbageCollector
      */
     protected function getContextMessage()
     {
+        return '';
+    }
+
+    public function getExtra()
+    {
+        if ($this->extra !== null) {
+            return call_user_func($this->extra);
+        }
+
         return '';
     }
 

@@ -67,6 +67,9 @@ class M180625055212LogInit extends Migration
             // create log table
             $this->createTable($target->logTable, [
                 'id' => $this->char(36)->notNull(),
+                'requested_at' => $this->double()
+                    ->notNull()
+                    ->comment('request time'),
                 'application' => $this->char(64)
                     ->notNull()
                     ->defaultValue('')
@@ -107,12 +110,12 @@ class M180625055212LogInit extends Migration
                     ->notNull()
                     ->defaultValue('')
                     ->comment('HTTP response status text'),
-                'requested_at' => $this->double()
-                    ->notNull()
-                    ->comment('request time'),
                 'context' => $this->text()
                     ->notNull()
                     ->comment('context'),
+                'extra' => $this->text()
+                    ->notNull()
+                    ->comment('extra info'),
             ], $tableOptions);
 
             $this->addPrimaryKey('PRIMARY KEY', $target->logTable, ['id']);
