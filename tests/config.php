@@ -6,7 +6,7 @@ return [
     'bootstrap' => ['log'],
     'components' => [
         'db' => [
-            'class' => \yii\db\Connection::class,
+            'class' => 'yii\db\Connection',
             'dsn' => 'mysql:host=localhost;dbname=testdb',
             'username' => 'root',
             'password' => '',
@@ -17,33 +17,28 @@ return [
         'log' => [
             'targets' => [
                 [
-                    'class' => \yii\log\FileTarget::class,
+                    'class' => 'yii\log\FileTarget',
                     'logFile' => __DIR__ . '/test.log',
                 ],
                 'db' => [
-                    'class' => \razonyang\yii\log\DbTarget::class,
+                    'class' => 'razonyang\yii\log\DbTarget',
                     'levels' => ['error', 'warning'],
                     'logTable' => '{{%log}}',
                     'logMessageTable' => '{{%log_message}}',
                 ],
             ],
         ],
-
-        // mutex is required by log rotate.
-        'mutex' => [
-            'class' => \yii\mutex\FileMutex::class,
-        ],
     ],
 
     'controllerMap' => [
         'migrate' => [
-            'class' => \yii\console\controllers\MigrateController::class,
+            'class' => 'yii\console\controllers\MigrateController',
             'migrationPath' => [
                 '@vendor/razonyang/yii-log/src/migrations',
             ],
         ],
         'log' => [
-            'class' => \razonyang\yii\log\LogController::class,
+            'class' => 'razonyang\yii\log\LogController',
         ]
     ],
 ];
