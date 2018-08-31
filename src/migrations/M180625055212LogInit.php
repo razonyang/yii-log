@@ -110,6 +110,9 @@ class M180625055212LogInit extends Migration
                 'requested_at' => $this->double()
                     ->notNull()
                     ->comment('request time'),
+                'context' => $this->text()
+                    ->notNull()
+                    ->comment('context'),
             ], $tableOptions);
 
             $this->addPrimaryKey('PRIMARY KEY', $target->logTable, ['id']);

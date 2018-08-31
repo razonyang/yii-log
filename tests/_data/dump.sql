@@ -30,6 +30,8 @@ CREATE TABLE `t_log` (
   COMMENT 'HTTP response status text',
   `requested_at` DOUBLE                          NOT NULL
   COMMENT 'request time',
+  `context`      TEXT COLLATE utf8mb4_unicode_ci NOT NULL
+  COMMENT 'context',
   PRIMARY KEY (`id`),
   KEY `idx_requested_at` (`requested_at`),
   KEY `idx_application` (`application`),

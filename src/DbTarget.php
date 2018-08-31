@@ -3,6 +3,7 @@ namespace razonyang\yii\log;
 
 use Ramsey\Uuid\Uuid;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\VarDumper;
 use yii\log\LogRuntimeException;
 use yii\web\Request as WebRequest;
@@ -100,8 +101,8 @@ class DbTarget extends \yii\log\DbTarget implements GarbageCollector
             $requestedAt = $this->getRequestedAt();
 
             $table = $this->db->quoteTableName($this->logTable);
-            $sql = "INSERT INTO $table ( [[id]], [[requested_at]], [[application]], [[route]], [[exit_status]], [[ip]], [[url]], [[method]], [[raw_body]], [[user_agent]], [[status]], [[status_text]])
-                VALUES (:id, :requested_at, :application, :route, :exit_status, :ip, :url, :method, :raw_body, :user_agent, :status, :status_text)";
+            $sql = "INSERT INTO $table ( [[id]], [[requested_at]], [[application]], [[route]], [[exit_status]], [[ip]], [[url]], [[method]], [[raw_body]], [[user_agent]], [[status]], [[status_text]], [[context]])
+                VALUES (:id, :requested_at, :application, :route, :exit_status, :ip, :url, :method, :raw_body, :user_agent, :status, :status_text, :context)";
             $command = $this->db->createCommand($sql);
             $logData = [
                 ':id' => $logId,
@@ -116,6 +117,7 @@ class DbTarget extends \yii\log\DbTarget implements GarbageCollector
                 ':user_agent' => '',
                 ':status' => 0,
                 ':status_text' => '',
+                ':context' => $this->getContext(),
             ];
             $app = Yii::$app;
             if ($app !== null) {
@@ -153,6 +155,25 @@ class DbTarget extends \yii\log\DbTarget implements GarbageCollector
         }
 
         return $this->logId;
+    }
+
+    /**
+     * @return string context
+     */
+    public function getContext()
+    {
+        $context = ArrayHelper::filter($GLOBALS, $this->logVars);
+        return json_encode($context, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Disabled context message.
+     *
+     * @return string
+     */
+    protected function getContextMessage()
+    {
+        return '';
     }
 
     /**
