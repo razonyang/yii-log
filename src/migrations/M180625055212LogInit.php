@@ -73,7 +73,7 @@ class M180625055212LogInit extends Migration
                 'application' => $this->char(64)
                     ->notNull()
                     ->defaultValue('')
-                    ->comment('application name'),
+                    ->comment('application ID'),
                 'route' => $this->char(255)
                     ->notNull()
                     ->defaultValue('')

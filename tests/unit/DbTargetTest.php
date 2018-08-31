@@ -47,7 +47,7 @@ class DbTargetTest extends \Codeception\Test\Unit
         $response = $app->getResponse();
         $logConditions = [
             'id' => $logId,
-            'application' => $app->name,
+            'application' => $app->id,
             'requested_at' => $this->target->requestedAt,
             'exit_status' => $response->exitStatus,
         ];

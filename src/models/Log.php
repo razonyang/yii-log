@@ -13,7 +13,7 @@ use yii\web\Response as WebResponse;
  * Class Log
  *
  * @property string $id request id
- * @property string $application application name
+ * @property string $application application ID
  * @property string $route requested route
  * @property integer $exit_status exit status
  * @property string $url request url

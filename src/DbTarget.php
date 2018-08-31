@@ -130,7 +130,7 @@ class DbTarget extends \yii\log\DbTarget implements GarbageCollector
                 $request = $app->getRequest();
                 $response = $app->getResponse();
 
-                $logData[':application'] = $app->name ?: '';
+                $logData[':application'] = $app->id;
                 $logData[':route'] = $app->requestedRoute ?: '';
                 $logData[':exit_status'] = $response->exitStatus;
 
