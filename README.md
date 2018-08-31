@@ -8,7 +8,7 @@ I wrote this extension for resolving the following problems:
 
 1. The logs are chaotic, I cannot distinguish which logs are came from the same requests.
  It is hard to debug in concurrent scenarios.
-2. The `yii\log\DbTarget` does not provide rotate feature.
+2. The `yii\log\DbTarget` does not provide GC feature.
 
 ## Installation
 
@@ -33,20 +33,12 @@ The usage is similar to `yii\log\DbTarget`.
                     'class' => \razonyang\yii\log\DbTarget::class,
                     'levels' => ['error', 'warning'],
                     'logTable' => '{{%log}}',
+                    'logMessageTable' => '{{%log_message}}',
 
-                    // rotate settings
-                    'rotateInterval' => 100000,
-                    // rotate mutex settings
-                    'rotateMutex' => 'mutex',
-                    'rotateMutexKey' => 'log_rotate',
-                    'rotateMutexAcquireTimeout' => 0,
+                    // garbage collection
+                    'maxLifeTime' => 30*24*3600, // 30 days
                 ],
             ],
-        ],
-
-        // mutex is required by log rotate.
-        'mutex' => [
-            'class' => \yii\mutex\FileMutex::class,
         ],
 
     ],
@@ -76,9 +68,9 @@ The usage is similar to `yii\log\DbTarget`.
 ./yii migrate
 ```
 
-### Rotate
+### Garbage Collection
 
 ```
-./yii log/rotate
+./yii log/gc
 ```
 

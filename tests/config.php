@@ -24,13 +24,7 @@ return [
                     'class' => \razonyang\yii\log\DbTarget::class,
                     'levels' => ['error', 'warning'],
                     'logTable' => '{{%log}}',
-
-                    // rotate settings
-                    'rotateInterval' => 100000,
-                    // rotate mutex settings
-                    'rotateMutex' => 'mutex',
-                    'rotateMutexKey' => 'log_rotate',
-                    'rotateMutexAcquireTimeout' => 0,
+                    'logMessageTable' => '{{%log_message}}',
                 ],
             ],
         ],

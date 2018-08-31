@@ -12,119 +12,92 @@ class DbTargetTest extends \Codeception\Test\Unit
      */
     protected $target;
 
-    /**
-     * @var string log table name
-     */
-    protected $tableName = 't_log';
-
     protected function _before()
     {
-        $this->target = new \razonyang\yii\log\DbTarget();
+        $this->target = Yii::$app->log->targets['db'];
     }
 
     protected function _after()
     {
+
     }
 
     public function testExport()
     {
         // generate logs.
-        $logs = [];
+        $messages = [];
         $times = rand(1, 10);
         for ($i = 0; $i < $times; $i++) {
-            $logs[] = [
-                'err' . $i,
-                \yii\log\Logger::LEVEL_ERROR,
+            $messages[] = [
+                $i,
+                $i % 2 == 0 ? \yii\log\Logger::LEVEL_ERROR : \yii\log\Logger::LEVEL_WARNING,
                 $i,
                 microtime(true),
             ];
         }
 
+        $this->target->messages = $messages;
         // export logs.
-        $target = Yii::$app->log->targets['db'];
-        $target->messages = $logs;
-        $target->export();
-
-        $requestId = $target->getRequestId();
-
-        // verify logs.
-        foreach ($logs as $log) {
-            list($message, $level, $category, $timestamp) = $log;
-            $this->tester->seeRecord('razonyang\yii\log\Log', [
-                'request_id' => $requestId,
-                'level' => $level,
-                'message' => $message,
-                'category' => $category,
-            ]);
-        }
-    }
-
-    public function testCanRotate()
-    {
-        $rotateIntervals = [
-            0 => false,
-        ];
-        $ranges = [
-            [-10000000, 1, false],
-            [1, 10000000, true],
-        ];
-        $times = rand(1, 10);
-        // generate random intervals.
-        foreach ($ranges as $range) {
-            for ($i = 0; $i < $times; $i++) {
-                $interval = rand($range[0], $range[1]);
-                $rotateIntervals[$interval] = $range[2];
-            }
-        }
-
-        foreach ($rotateIntervals as $rotateInterval => $expected) {
-            $this->target->rotateInterval = $rotateInterval;
-            $this->assertEquals($expected, $this->target->canRotate());
-        }
-    }
-
-    public function testRotate()
-    {
-        // generate logs
-        $logs = [];
-        $times = 100;
-        for ($i = 0; $i < $times; $i++) {
-            $logs[] = [
-                'err' . $i,
-                \yii\log\Logger::LEVEL_ERROR,
-                $i,
-                microtime(true),
-            ];
-        }
-
-        // export logs.
-        $this->target->messages = $logs;
-        codecept_debug('export messages');
         $this->target->export();
 
-        $this->target->rotateInterval = $times - rand(0, $times - 1);
-        $this->target->rotate();
+        $logId = $this->target->getLogId();
 
-        $rotateTableName = $this->target->rotateTableName();
-        $requestId = $this->target->getRequestId();
+        // check log.
+        $app = Yii::$app;
+        $response = $app->getResponse();
+        $logConditions = [
+            'id' => $logId,
+            'application' => $app->name,
+            'requested_at' => $this->target->requestedAt,
+            'exit_status' => $response->exitStatus,
+        ];
+        $this->tester->seeRecord('razonyang\yii\log\models\Log', $logConditions);
 
-        $rotateModel = <<<EOL
-class {$rotateTableName} extends \yii\db\ActiveRecord {
-    public static function tableName() {
-        return '{$rotateTableName}';
-    }
-}
-EOL;
-        eval($rotateModel);
-
-        foreach ($logs as $log) {
-            list($message, $level, $category, $timestamp) = $log;
-            $this->tester->seeRecord($rotateTableName, [
-                'request_id' => $requestId,
+        // check messages
+        foreach ($messages as $message) {
+            list($msg, $level, $category, $timestamp) = $message;
+            $this->tester->seeRecord('razonyang\yii\log\models\LogMessage', [
+                'log_id' => $logId,
                 'level' => $level,
-                'message' => $message,
+                'message' => $msg,
                 'category' => $category,
+                'message_time' => $timestamp,
             ]);
         }
+    }
+
+    public function testGc()
+    {
+        // insert some logs
+        $messages = [];
+        $times = rand(1, 10);
+        for ($i = 0; $i < $times; $i++) {
+            $messages[] = [
+                $i,
+                $i % 2 == 0 ? \yii\log\Logger::LEVEL_ERROR : \yii\log\Logger::LEVEL_WARNING,
+                $i,
+                microtime(true),
+            ];
+        }
+
+        $this->target->messages = $messages;
+        // export logs.
+        $this->target->export();
+
+        // changed log max life time
+        $this->target->maxLifeTime = 24 * 3600;
+        $this->assertEquals([0, 0], $this->target->gc());
+
+        // disabled gc
+        $this->target->maxLifeTime = 0;
+        $this->assertFalse($this->target->gc());
+
+        // changed log max life time as one second and sleep.
+        $maxLifeTime = 1;
+        $this->target->maxLifeTime = $maxLifeTime;
+        // make sure the messages has been expired.
+        sleep($maxLifeTime + 1);
+
+        $this->assertEquals([1, count($messages)], $this->target->gc());
     }
 }

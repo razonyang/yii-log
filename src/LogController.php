@@ -3,35 +3,10 @@ namespace razonyang\yii\log;
 
 use Yii;
 use yii\console\Controller;
+use yii\helpers\Console;
 
 class LogController extends Controller
 {
-    public function actionRotate()
-    {
-        $log = Yii::$app->getLog();
-        foreach ($log->targets as $target) {
-            if (!$target instanceof Rotate) {
-                $msg = 'the log target does not implement razonyang\yii\log\Rotate: ' . get_class($target);
-                Yii::info($msg, __METHOD__);
-                echo $msg . PHP_EOL;
-                continue;
-            } else if (!$target->canRotate()) {
-                $msg = 'can not rotate or rotate has been disabled: ' . get_class($target);
-                Yii::info($msg, __METHOD__);
-                echo $msg . PHP_EOL;
-                continue;
-            }
-
-            try {
-                $target->rotate();
-                echo 'rotated successfully' . PHP_EOL;
-            } catch (\Exception $e) {
-                Yii::error($e, __METHOD__);
-                echo $e->getMessage() . PHP_EOL;
-            }
-        }
-    }
-
     /**
      * Garbage collection.
      */
@@ -44,7 +19,13 @@ class LogController extends Controller
             }
 
             try {
-                $target->gc();
+                $response = $target->gc();
+                if ($response === false) {
+                    $this->stdout('GC has been disabled', Console::FG_RED);
+                    continue;
+                }
+                list($logs, $messages) = $response;
+                $this->stdout("Deleted logs: {$logs}, messages: {$messages}", Console::FG_GREEN);
             } catch (\Exception $e) {
                 Yii::error($e, __METHOD__);
             }

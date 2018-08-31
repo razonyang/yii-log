@@ -4,7 +4,8 @@ namespace razonyang\yii\log;
 interface GarbageCollector
 {
     /**
-     * @return int the number of garbage that has been cleaned.
+     * @return bool|array the number of logs and messages that has been cleaned.
+     * If gc has been disabled, return false instead.
      */
     public function gc();
 }
