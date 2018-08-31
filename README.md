@@ -44,7 +44,7 @@ The usage is similar to `yii\log\DbTarget`.
     ],
 
 
-    // migrate and rotate settings for console application.
+    // migrate and garbage collection settings for console application.
     'controllerMap' => [
         'migrate' => [
             'class' => \yii\console\controllers\MigrateController::class,
