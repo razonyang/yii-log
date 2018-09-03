@@ -55,6 +55,15 @@ class DbTarget extends \yii\log\DbTarget implements GarbageCollector
                     $text = VarDumper::export($text);
                 }
             }
+            $traces = [];
+            if (isset($message[4])) {
+                foreach ($message[4] as $trace) {
+                    $traces[] = "in {$trace['file']}:{$trace['line']}";
+                }
+            }
+            if ($traces) {
+                $text .= "\n    " . implode("\n    ", $traces);
+            }
             if ($command->bindValues([
                     ':log_id' => $logId,
                     ':requested_at' => $requestedAt,
