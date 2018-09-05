@@ -14,7 +14,7 @@ use razonyang\yii\log\DbTarget;
  * @author Alexander Makarov <sam@rmcreative.ru>
  * @since 2.0.1
  */
-class php extends Migration
+class m180903_055619_log_init extends Migration
 {
     /**
      * @var DbTarget[] Targets to create log table for
